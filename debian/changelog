@@ -1,3 +1,9 @@
+qemu (1:2.5+dfsg-5ubuntu10.26+osrf1) xenial; urgency=medium
+
+  * Include linux-user-return-EINVAL-from-prctl-PR_-_SECCOMP.patch
+
+ -- Jose Luis Rivero <jrivero@osrfoundation.org>  Sat, 05 May 2018 18:12:47 +0200
+
 qemu (1:2.5+dfsg-5ubuntu10.26) xenial; urgency=medium
 
   * d/p/ubuntu/lp-1705743-fix-vnc-crash.patch: fix crash when using long or
