@@ -1,0 +1,35 @@
+If an application tries to install a seccomp filter using
+prctl(PR_SET_SECCOMP), the filter is likely for the target instead of the host
+architecture. This will probably cause qemu to be immediately killed when it
+executes another syscall.
+
+Prevent this from happening by returning EINVAL from both seccomp prctl
+calls. This is the error returned by the kernel when seccomp support is
+disabled.
+
+Fixes: https://bugs.launchpad.net/qemu/+bug/1726394
+Signed-off-by: James Cowgill <address@hidden>
+---
+Changes from v1:
+- add comment
+
+ linux-user/syscall.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 6c64ba6..1b6aa66 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8178,6 +8178,12 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             break;
+         }
+ #endif
++        case PR_GET_SECCOMP:
++        case PR_SET_SECCOMP:
++            /* Disable seccomp to prevent the target disabling syscalls we
++             * need. */
++            ret = -TARGET_EINVAL;
++            break;
+         default:
+             /* Most prctl options have no pointer arguments */
+             ret = get_errno(prctl(arg1, arg2, arg3, arg4, arg5));
